@@ -172,6 +172,8 @@
                         <exclude>**/.externalToolBuilders/*</exclude>
                         <exclude>*.patch</exclude>
                         <exclude>atlassian-ide-plugin.xml</exclude>
+                        <exclude>README.txt</exclude>
+                        <exclude>build.sh</exclude>
                     </excludes>
                 </configuration>
             </plugin>
