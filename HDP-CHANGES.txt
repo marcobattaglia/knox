@@ -1,0 +1,12 @@
+Changes only in Hortonworks github and not in apache and hence not covered by CHANGES.txt. On top of v0.3.0 for knox.
+
+  INCOMPATIBLE CHANGES
+
+  NEW FEATURES
+
+  IMPROVEMENTS
+
+  BUG FIXES
+
+      KNOX-203 Gateway fails to start when {GATEWAY_HOME}/bin not writable
+      KNOX-205 Launcher script (gateway.sh) not working when gateway installed via RPM
