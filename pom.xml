@@ -73,7 +73,15 @@
         <gateway-group>org.apache.hadoop</gateway-group>
         <jetty-version>8.1.12.v20130726</jetty-version>
     </properties>
-
+    
+    <distributionManagement>
+        <repository>
+            <id>${repoid}</id>
+            <name>${reponame}</name>
+            <url>${repourl}</url>
+        </repository>
+    </distributionManagement>
+ 
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
