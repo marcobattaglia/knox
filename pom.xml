@@ -54,6 +54,7 @@
         <module>gateway-provider-security-authz-acls</module>
         <module>gateway-provider-identity-assertion-common</module>
         <module>gateway-provider-identity-assertion-concat</module>
+        <module>gateway-provider-identity-assertion-regex</module>
         <module>gateway-provider-identity-assertion-pseudo</module>
         <module>gateway-provider-jersey</module>
         <module>gateway-provider-ha</module>
@@ -452,6 +453,11 @@
             </dependency>
             <dependency>
                 <groupId>${gateway-group}</groupId>
+                <artifactId>gateway-provider-identity-assertion-regex</artifactId>
+                <version>${gateway-version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${gateway-group}</groupId>
                 <artifactId>gateway-provider-rewrite</artifactId>
                 <version>${gateway-version}</version>
             </dependency>
@@ -576,7 +582,7 @@
                 <version>${gateway-version}</version>
             </dependency>
 
-            <dependency>
+        <dependency>
                 <groupId>org.glassfish.jersey.containers</groupId>
                 <artifactId>jersey-container-servlet</artifactId>
                 <version>2.6</version>

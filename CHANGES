@@ -2,7 +2,8 @@
 Release Notes - Apache Knox - Version 0.5.1
 ------------------------------------------------------------------------------
 ** Improvement
-  * [KNOX-470] - add README and site docs for samples
+    * [KNOX-470] - add README and site docs for samples
+    * [KNOX-579] - Regex based identity assertion provider with static dictionary lookup
 
 ** Bug
     * [KNOX-467] - Unit tests failing on windows. Second attempt.
