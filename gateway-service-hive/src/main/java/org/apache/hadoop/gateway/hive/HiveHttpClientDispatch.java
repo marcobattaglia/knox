@@ -19,6 +19,7 @@ package org.apache.hadoop.gateway.hive;
 
 import org.apache.hadoop.gateway.dispatch.HttpClientDispatch;
 import org.apache.hadoop.gateway.security.PrimaryPrincipal;
+import org.apache.hadoop.gateway.security.SubjectUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -60,22 +61,13 @@ public class HiveHttpClientDispatch extends HttpClientDispatch {
     }
   }
 
-  protected Principal getPrimaryPrincipal() {
-    Principal principal = null;
-    Subject subject = Subject.getSubject( AccessController.getContext());
-    if( subject != null ) {
-      principal = (Principal)subject.getPrincipals(PrimaryPrincipal.class).toArray()[0];
-    }
-    return principal;
-  }
-
   protected void addCredentialsToRequest(HttpUriRequest request) {
     if( isBasicAuthPreemptive() ) {
-      Principal principal = getPrimaryPrincipal();
+      String principal = SubjectUtils.getCurrentEffectivePrincipalName();
       if( principal != null ) {
 
         UsernamePasswordCredentials credentials =
-            new UsernamePasswordCredentials( principal.getName(), PASSWORD_PLACEHOLDER );
+            new UsernamePasswordCredentials( principal, PASSWORD_PLACEHOLDER );
         
         request.addHeader(BasicScheme.authenticate(credentials,"US-ASCII",false));
       }
