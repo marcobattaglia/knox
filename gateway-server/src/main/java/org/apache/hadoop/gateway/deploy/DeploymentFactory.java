@@ -39,6 +39,9 @@ import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.webapp30.WebAppDescriptor;
 import org.jboss.shrinkwrap.descriptor.api.webcommon30.ServletType;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import java.beans.Statement;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -87,7 +90,30 @@ public abstract class DeploymentFactory {
       // if this is the default topology then add the forwarding webapp as well
       context = deployDefaultTopology(config, topology);
     }
+    storeTopology( context, topology );
     return context.getWebArchive();
+  }
+
+  private static void storeTopology( DeploymentContext context, Topology topology ) {
+    StringWriter writer = new StringWriter();
+    String xml;
+    try {
+      Map<String,Object> properties = new HashMap<String,Object>(2);
+      properties.put( "eclipselink-oxm-xml", "org/apache/hadoop/gateway/topology/topology_binding-xml.xml" );
+      properties.put( "eclipselink.media-type", "application/xml" );
+      JAXBContext jaxbContext = JAXBContext.newInstance( Topology.class.getPackage().getName(), Topology.class.getClassLoader() , properties );
+      Marshaller marshaller = jaxbContext.createMarshaller();
+      marshaller.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, true );
+      marshaller.marshal( topology, writer );
+      writer.close();
+      xml = writer.toString();
+    } catch (IOException e) {
+      throw new DeploymentException( "Failed to marshall topology.", e );
+    } catch (JAXBException e) {
+      throw new DeploymentException( "Failed to marshall topology.", e );
+    }
+    StringAsset asset = new StringAsset( xml );
+    context.getWebArchive().addAsWebInfResource( asset, "topology.xml" );
   }
 
   private static DeploymentContext deployDefaultTopology(GatewayConfig config,
@@ -222,6 +248,7 @@ public abstract class DeploymentFactory {
           if (gatewayServices != null) {
             injectServices(contributor);
           }
+          log.initializeProvider( contributor.getName(), contributor.getRole() );
           contributor.initializeContribution( context );
         } catch( Exception e ) {
           log.failedToInitializeContribution( e );
@@ -235,6 +262,7 @@ public abstract class DeploymentFactory {
           if (services != null) {
             injectServices(contributor);
           }
+          log.initializeService( contributor.getName(), contributor.getRole() );
           contributor.initializeContribution( context );
         } catch( Exception e ) {
           log.failedToInitializeContribution( e );
@@ -275,6 +303,7 @@ public abstract class DeploymentFactory {
       ProviderDeploymentContributor contributor = getProviderContributor( providers, provider.getRole(), provider.getName() );
       if( contributor != null && provider.isEnabled() ) {
         try {
+          log.contributeProvider( provider.getName(), provider.getRole() );
           contributor.contributeProvider( context, provider );
         } catch( Exception e ) {
           // Maybe it makes sense to throw exception
@@ -287,6 +316,7 @@ public abstract class DeploymentFactory {
       ServiceDeploymentContributor contributor = getServiceContributor( service.getRole(), null );
       if( contributor != null ) {
         try {
+          log.contributeService( service.getName(), service.getRole() );
           contributor.contributeService( context, service );
           if (gatewayServices != null) {
             ServiceRegistry sr = (ServiceRegistry) gatewayServices.getService(GatewayServices.SERVICE_REGISTRY_SERVICE);
@@ -354,6 +384,7 @@ public abstract class DeploymentFactory {
       for( String role : providers.keySet() ) {
         for( ProviderDeploymentContributor contributor : providers.get( role ) ) {
           try {
+            log.finalizeProvider( contributor.getName(), contributor.getRole() );
             contributor.finalizeContribution( context );
           } catch( Exception e ) {
             // Maybe it makes sense to throw exception
@@ -365,6 +396,7 @@ public abstract class DeploymentFactory {
       for( String role : services.keySet() ) {
         for( ServiceDeploymentContributor contributor : services.get( role ) ) {
           try {
+            log.finalizeService( contributor.getName(), contributor.getRole() );
             contributor.finalizeContribution( context );
           } catch( Exception e ) {
             // Maybe it makes sense to throw exception
