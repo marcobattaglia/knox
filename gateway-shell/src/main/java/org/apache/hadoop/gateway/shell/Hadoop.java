@@ -134,11 +134,19 @@ public class Hadoop {
 
   public void shutdown() throws InterruptedException {
     executor.shutdownNow();
+    closeClient();
   }
 
   public boolean shutdown( long timeout, TimeUnit unit ) throws InterruptedException {
     executor.shutdown();
+    closeClient();
     return executor.awaitTermination( timeout, unit );
+  }
+  
+  private void closeClient(){
+    if(client!=null){
+      client.close();
+    }
   }
 
 }
